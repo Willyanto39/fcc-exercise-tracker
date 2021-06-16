@@ -1,10 +1,10 @@
-const express = require('express')
-const app = express()
-const cors = require('cors')
+const express = require('express');
+const app = express();
+const cors = require('cors');
 const mongoose = require('mongoose');
 const User = require('./models/User');
 const Exercise = require('./models/Exercise');
-require('dotenv').config()
+require('dotenv').config();
 
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
@@ -17,11 +17,12 @@ mongoose.connect(process.env.MONGO_URI, {
   }
 });
 
-app.use(cors())
+app.use(cors());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static('public'))
+app.use(express.static('public'));
+
 app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/views/index.html')
+  res.sendFile(__dirname + '/views/index.html');
 });
 
 app.route('/api/users')
@@ -51,14 +52,14 @@ app.route('/api/users')
 
     try {
       await newUser.save();
+
+      return res.json({
+        _id: newUser._id,
+        username: newUser.username
+      });
     } catch(err) {
       return res.json({ error: err.message });
     }
-
-    return res.json({
-      _id: newUser._id,
-      username: newUser.username
-    });
   });
 
 app.post('/api/users/:_id/exercises', async (req, res) => {
@@ -85,17 +86,18 @@ app.post('/api/users/:_id/exercises', async (req, res) => {
 
   try {
     await newExercise.save();
+
+    return res.json({
+      _id: userData._id,
+      username: userData.username,
+      date: newExercise.date.toDateString(),
+      duration: newExercise.duration,
+      description: newExercise.description
+    });
   } catch(err) {
     return res.json({ error: err.message });
   }
 
-  return res.json({
-    _id: userData._id,
-    username: userData.username,
-    date: newExercise.date.toDateString(),
-    duration: newExercise.duration,
-    description: newExercise.description
-  });
 });
 
 app.get('/api/users/:_id/logs', async (req, res) => {
